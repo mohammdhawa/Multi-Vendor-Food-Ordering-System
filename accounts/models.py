@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
+        print(f"create_user called: username={username}, email={email}")
         if not email:
             raise ValueError('Email must be set')
 
@@ -17,10 +18,13 @@ class UserManager(BaseUserManager):
             last_name = last_name,
         )
         user.set_password(password)
+        print(f"Before saving user: username={user.username}, email={user.email}")
         user.save(using=self._db)
+        print(f"User saved: username={user.username}, id={user.id}")
         return user
 
     def create_superuser(self, first_name, last_name, username, email, password=None):
+        print(f"create_superuser called: username={username}, email={email}")
         user = self.create_user(
             email = email,
             username = username,
@@ -28,11 +32,13 @@ class UserManager(BaseUserManager):
             first_name = first_name,
             last_name = last_name,
         )
+        print(f"Superuser created, setting flags: username={user.username}")
         user.is_admin = True
         user.is_active = True
         user.is_staff = True
         user.is_superadmin = True
         user.save(using=self._db)
+        print(f"Superuser saved: username={user.username}, id={user.id}")
         return user
 
 
@@ -95,4 +101,3 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return str(self.user.email)
-
